@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video to Avatar Animation</title>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <style>
+        body {
+            margin: 20px;
+        }
+        .avatar-animation {
+            width: 600px;
+            height: 400px;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Video to Avatar Animation</h1>
+
+    <form id="videoForm">
+        <label for="videoInput">Upload a video:</label>
+        <input type="file" id="videoInput" accept="video/*">
+        <button type="submit">Convert to Animation</button>
+    </form>
+
+    <div id="avatarContainer" class="avatar-animation">
+        <!-- Avatar animation will be displayed here -->
+    </div>
+
+    <script>
+        var initCfg = {
+            "avsbsl": ["luna", "siggi", "anna", "marc", "francoise"],
+            "avSettings": { 
+                "avList": "avsbsl", 
+                "initAv": "marc" // Initial avatar
+            }
+        };
+
+        // Initialize avatars
+        $(document).ready(function() {
+            $('#videoForm').on('submit', function(event) {
+                event.preventDefault();
+
+                var fileInput = $('#videoInput')[0].files[0];
+                if (!fileInput) {
+                    alert("Please upload a video file.");
+                    return;
+                }
+
+                var formData = new FormData();
+                formData.append('video', fileInput);
+
+                // Send the video to the Python server for processing
+                $.ajax({
+                    url: 'http://127.0.0.1:5000/convert_video', // Flask server URL
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        // Assuming the server returns the ISL command sequence for animation
+                        startAvatarAnimation(response.islCommands);
+                    },
+                    error: function() {
+                        alert("Error processing video.");
+                    }
+                });
+            });
+
+            function startAvatarAnimation(islCommands) {
+                // Example logic to interpret ISL commands for animation
+                // Replace this with your avatar library logic
+                console.log(islCommands); // Placeholder for actual animation
+                $('#avatarContainer').html('<p>Animation started with commands: ' + islCommands + '</p>');
+            }
+        });
+    </script>
+
+</body>
+</html>
